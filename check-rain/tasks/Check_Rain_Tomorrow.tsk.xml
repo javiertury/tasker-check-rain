@@ -1,0 +1,137 @@
+<TaskerData sr="" dvi="1" tv="5.0u3m">
+	<Task sr="task4">
+		<cdate>1500918774141</cdate>
+		<edate>1501419586386</edate>
+		<id>4</id>
+		<nme>Check Rain Tomorrow</nme>
+		<pri>100</pri>
+		<Action sr="act0" ve="7">
+			<code>129</code>
+			<Str sr="arg0" ve="3">var loc_qs;
+var loc_s;
+var lat_lon;
+var err;
+global('W_tmw_title') || setGlobal('W_tmw_title', 'Tomorrow It Will Rain');
+if (/^city/i.test(global('W_tmw_type'))) {
+global('W_loc_city') || (err = 1);
+loc_qs = 'q=' + global('W_loc_city');
+loc_s = global('W_loc_city');
+} else {
+//auto
+if(global('LOCTMS') &amp;&amp; global('LOCNTMS')) {
+lat_lon = (global('LOCNTMS') &gt; global('LOCTMS') ? global('LOCN') : global('LOC')).split(',',2);
+} else {
+lat_lon = (global('LOC') || global('LOCN')).split(',',2);
+}
+(lat_lon[0] &amp;&amp; lat_lon[1]) || (err = 1);
+loc_qs = 'lat=' + lat_lon[0] + '&amp;lon=' + lat_lon[1];
+loc_s = 'your location';
+}</Str>
+			<Str sr="arg1" ve="3"/>
+			<Int sr="arg2" val="1"/>
+			<Int sr="arg3" val="50"/>
+		</Action>
+		<Action sr="act1" ve="7">
+			<code>137</code>
+			<Int sr="arg0" val="1"/>
+			<Str sr="arg1" ve="3"/>
+			<ConditionList sr="if">
+				<Condition sr="c0" ve="3">
+					<lhs>%err</lhs>
+					<op>0</op>
+					<rhs>1</rhs>
+				</Condition>
+			</ConditionList>
+		</Action>
+		<Action sr="act2" ve="7">
+			<code>118</code>
+			<label>forecast</label>
+			<Str sr="arg0" ve="3">api.openweathermap.org</Str>
+			<Str sr="arg1" ve="3">/data/2.5/forecast?%loc_qs&amp;APPID=%W_ow_key</Str>
+			<Str sr="arg2" ve="3"/>
+			<Str sr="arg3" ve="3"/>
+			<Str sr="arg4" ve="3"/>
+			<Int sr="arg5" val="90"/>
+			<Str sr="arg6" ve="3"/>
+			<Str sr="arg7" ve="3"/>
+			<Int sr="arg8" val="0"/>
+		</Action>
+		<Action sr="act3" ve="7">
+			<code>129</code>
+			<label>forecast</label>
+			<Str sr="arg0" ve="3">var forecast = JSON.parse(global('HTTPD'));
+var ttmw = (new Date().setHours(24,0,0,0)) / 1000;
+var tstart = ttmw + 60*60*global('W_tmw_hstart');
+var tend = ttmw + 60*60*24;
+var first_rain = forecast.list.map(item =&gt; {
+return item.dt &gt;= tstart &amp;&amp; item.dt &lt;= tend &amp;&amp; item.weather.some(i =&gt; {return i.id &gt;= 200 &amp;&amp; i.id &lt;= 699;});
+}).indexOf(true);
+var tmw_rains = first_rain &gt;= 0;
+var rain_start;
+var rain_start_s;
+if (tmw_rains) {
+rain_start = new Date(forecast.list[first_rain].dt * 1000);
+rain_start_s = rain_start.getHours() + ':' + ((rain_start.getMinutes() &gt; 9) ? '' : 0) + rain_start.getMinutes();
+}</Str>
+			<Str sr="arg1" ve="3"/>
+			<Int sr="arg2" val="1"/>
+			<Int sr="arg3" val="50"/>
+		</Action>
+		<Action sr="act4" ve="7">
+			<code>538</code>
+			<Str sr="arg0" ve="3">%W_tmw_title</Str>
+			<Str sr="arg1" ve="3">Rain in %loc_s tomorrow around %rain_start_s</Str>
+			<Img sr="arg2" ve="2">
+				<nme>hd_aaa_ext_rain</nme>
+			</Img>
+			<Int sr="arg3" val="0"/>
+			<Str sr="arg4" ve="3"/>
+			<Int sr="arg5" val="3"/>
+			<Int sr="arg6" val="0"/>
+			<ConditionList sr="if">
+				<Condition sr="c0" ve="3">
+					<lhs>%tmw_rains</lhs>
+					<op>0</op>
+					<rhs>true</rhs>
+				</Condition>
+			</ConditionList>
+		</Action>
+		<Action sr="act5" ve="7">
+			<code>61</code>
+			<on>false</on>
+			<Int sr="arg0" val="200"/>
+			<ConditionList sr="if">
+				<Condition sr="c0" ve="3">
+					<lhs>%tmw_rains</lhs>
+					<op>0</op>
+					<rhs>true</rhs>
+				</Condition>
+			</ConditionList>
+		</Action>
+		<Action sr="act6" ve="7">
+			<code>779</code>
+			<Str sr="arg0" ve="3">%W_tmw_title</Str>
+			<Int sr="arg1" val="0"/>
+			<ConditionList sr="if">
+				<Condition sr="c0" ve="3">
+					<lhs>%tmw_rains</lhs>
+					<op>1</op>
+					<rhs>true</rhs>
+				</Condition>
+			</ConditionList>
+		</Action>
+		<Action sr="act7" ve="7">
+			<code>523</code>
+			<on>false</on>
+			<Str sr="arg0" ve="3">Does It Rain Tomorrow?</Str>
+			<Str sr="arg1" ve="3">%tstart %tend %tmw_rains %first_rain %rain_start_s
+%loc_s %loc_qs</Str>
+			<Img sr="arg2" ve="2">
+				<nme>hd_aaa_ext_rain</nme>
+			</Img>
+			<Int sr="arg3" val="0"/>
+			<Int sr="arg4" val="0"/>
+			<Int sr="arg5" val="3"/>
+		</Action>
+	</Task>
+</TaskerData>

@@ -1,0 +1,220 @@
+<TaskerData sr="" dvi="1" tv="5.0u3m">
+	<Profile sr="prof3" ve="2">
+		<cdate>1501074792787</cdate>
+		<clp>true</clp>
+		<edate>1501088559545</edate>
+		<id>3</id>
+		<mid0>18</mid0>
+		<nme>Check Rain Continuous</nme>
+		<Time sr="con0">
+			<fh>9</fh>
+			<fm>0</fm>
+			<rep>1</rep>
+			<repval>3</repval>
+			<th>23</th>
+			<tm>0</tm>
+		</Time>
+	</Profile>
+	<Task sr="task18">
+		<cdate>1500918774141</cdate>
+		<edate>1501416699954</edate>
+		<id>18</id>
+		<nme>Check Rain Continuous</nme>
+		<pri>100</pri>
+		<Action sr="act0" ve="7">
+			<code>129</code>
+			<Str sr="arg0" ve="3">var loc_qs;
+var loc_s;
+var lat_lon;
+var err;
+var chk_fc;
+if (/^on/i.test(global('W_con_current'))) {
+chk_fc = 'current';
+} else if (/^off/i.test(global('W_con_current'))) {
+chk_fc = 'future';
+} else {
+//smart
+/^smart/i.test(global('W_con_current')) || setGlobal('W_con_current', 'smart');
+chk_fc = 'future';
+}
+global('W_con_title') || setGlobal('W_con_title', 'Rain In A Few Hours');
+if (/^city/i.test(global('W_con_type'))) {
+global('W_loc_city') || (err = 1);
+loc_qs = 'q=' + global('W_loc_city');
+loc_s = global('W_loc_city');
+} else {
+//auto
+if(global('LOCTMS') &amp;&amp; global('LOCNTMS')) {
+lat_lon = (global('LOCNTMS') &gt; global('LOCTMS') ? global('LOCN') : global('LOC')).split(',',2);
+} else {
+lat_lon = (global('LOC') || global('LOCN')).split(',',2);
+}
+(lat_lon[0] &amp;&amp; lat_lon[1]) || (err = 1);
+loc_qs = 'lat=' + lat_lon[0] + '&amp;lon=' + lat_lon[1];
+loc_s = 'your location';
+}</Str>
+			<Str sr="arg1" ve="3"/>
+			<Int sr="arg2" val="1"/>
+			<Int sr="arg3" val="50"/>
+		</Action>
+		<Action sr="act1" ve="7">
+			<code>137</code>
+			<Int sr="arg0" val="1"/>
+			<Str sr="arg1" ve="3"/>
+			<ConditionList sr="if">
+				<Condition sr="c0" ve="3">
+					<lhs>%err</lhs>
+					<op>0</op>
+					<rhs>1</rhs>
+				</Condition>
+			</ConditionList>
+		</Action>
+		<Action sr="act2" ve="7">
+			<code>118</code>
+			<label>current</label>
+			<Str sr="arg0" ve="3">api.openweathermap.org</Str>
+			<Str sr="arg1" ve="3">/data/2.5/weather?%loc_qs&amp;APPID=%W_ow_key</Str>
+			<Str sr="arg2" ve="3"/>
+			<Str sr="arg3" ve="3"/>
+			<Str sr="arg4" ve="3"/>
+			<Int sr="arg5" val="91"/>
+			<Str sr="arg6" ve="3"/>
+			<Str sr="arg7" ve="3"/>
+			<Int sr="arg8" val="0"/>
+			<ConditionList sr="if">
+				<Condition sr="c0" ve="3">
+					<lhs>%chk_fc</lhs>
+					<op>0</op>
+					<rhs>current</rhs>
+				</Condition>
+			</ConditionList>
+		</Action>
+		<Action sr="act3" ve="7">
+			<code>129</code>
+			<label>current</label>
+			<Str sr="arg0" ve="3">var current = JSON.parse(global('HTTPD'));
+if (! current.weather.some(i =&gt; {return i.id &gt;= 200 &amp;&amp; i.id &lt;= 699;})) {
+chk_fc = 'future';
+};</Str>
+			<Str sr="arg1" ve="3"/>
+			<Int sr="arg2" val="1"/>
+			<Int sr="arg3" val="50"/>
+			<ConditionList sr="if">
+				<Condition sr="c0" ve="3">
+					<lhs>%chk_fc</lhs>
+					<op>0</op>
+					<rhs>current</rhs>
+				</Condition>
+			</ConditionList>
+		</Action>
+		<Action sr="act4" ve="7">
+			<code>118</code>
+			<label>forecast</label>
+			<Str sr="arg0" ve="3">api.openweathermap.org</Str>
+			<Str sr="arg1" ve="3">/data/2.5/forecast?%loc_qs&amp;APPID=%W_ow_key</Str>
+			<Str sr="arg2" ve="3"/>
+			<Str sr="arg3" ve="3"/>
+			<Str sr="arg4" ve="3"/>
+			<Int sr="arg5" val="90"/>
+			<Str sr="arg6" ve="3"/>
+			<Str sr="arg7" ve="3"/>
+			<Int sr="arg8" val="0"/>
+			<ConditionList sr="if">
+				<Condition sr="c0" ve="3">
+					<lhs>%chk_fc</lhs>
+					<op>0</op>
+					<rhs>future</rhs>
+				</Condition>
+			</ConditionList>
+		</Action>
+		<Action sr="act5" ve="7">
+			<code>129</code>
+			<label>forecast</label>
+			<Str sr="arg0" ve="3">var forecast = JSON.parse(global('HTTPD'));
+var tend = Date.now() / 1000 + 60*60*(global('W_con_hahead') || 6);
+var fc_bools = forecast.list.map(item =&gt; {
+return item.dt &lt;= tend &amp;&amp; item.weather.some(i =&gt; {return i.id &gt;= 200 &amp;&amp; i.id &lt;= 699;});
+});
+var first_rain = fc_bools.indexOf(true);
+var will_rain = first_rain &gt;= 0;
+var rain_start;
+var rain_start_s;
+var notified;
+if (will_rain) {
+rain_start = new Date(forecast.list[first_rain].dt * 1000);
+rain_start_s = rain_start.getHours() + ':' + ((rain_start.getMinutes() &gt; 9) ? '' : 0) + rain_start.getMinutes();
+if (/^smart/i.test(global('W_con_current'))) {
+notified = global('W_con_rain_dt') &gt;= forecast.list[first_rain].dt;
+var rain_end = fc_bools.indexOf(false, first_rain) - 1;
+setGlobal('W_con_rain_dt', forecast.list[rain_end].dt);
+}
+}</Str>
+			<Str sr="arg1" ve="3"/>
+			<Int sr="arg2" val="1"/>
+			<Int sr="arg3" val="50"/>
+			<ConditionList sr="if">
+				<Condition sr="c0" ve="3">
+					<lhs>%chk_fc</lhs>
+					<op>0</op>
+					<rhs>future</rhs>
+				</Condition>
+			</ConditionList>
+		</Action>
+		<Action sr="act6" ve="7">
+			<code>538</code>
+			<Str sr="arg0" ve="3">%W_con_title</Str>
+			<Str sr="arg1" ve="3">It will start raining in %loc_s around %rain_start_s</Str>
+			<Img sr="arg2" ve="2">
+				<nme>hd_aaa_ext_rain</nme>
+			</Img>
+			<Int sr="arg3" val="0"/>
+			<Str sr="arg4" ve="3"/>
+			<Int sr="arg5" val="3"/>
+			<Int sr="arg6" val="0"/>
+			<ConditionList sr="if">
+				<bool0>And</bool0>
+				<Condition sr="c0" ve="3">
+					<lhs>%notified</lhs>
+					<op>1</op>
+					<rhs>true</rhs>
+				</Condition>
+				<Condition sr="c1" ve="3">
+					<lhs>%will_rain</lhs>
+					<op>0</op>
+					<rhs>true</rhs>
+				</Condition>
+			</ConditionList>
+		</Action>
+		<Action sr="act7" ve="7">
+			<code>779</code>
+			<Str sr="arg0" ve="3">%W_con_title</Str>
+			<Int sr="arg1" val="0"/>
+			<ConditionList sr="if">
+				<bool0>And</bool0>
+				<Condition sr="c0" ve="3">
+					<lhs>%will_rain</lhs>
+					<op>12</op>
+					<rhs>false</rhs>
+				</Condition>
+				<Condition sr="c1" ve="3">
+					<lhs>%will_rain</lhs>
+					<op>0</op>
+					<rhs>false</rhs>
+				</Condition>
+			</ConditionList>
+		</Action>
+		<Action sr="act8" ve="7">
+			<code>523</code>
+			<on>false</on>
+			<Str sr="arg0" ve="3">Will It Rain The Next Few Hours?</Str>
+			<Str sr="arg1" ve="3">Check forecast? %chk_fc , Will it rain? %will_rain
+%loc_s %loc_qs</Str>
+			<Img sr="arg2" ve="2">
+				<nme>hd_aaa_ext_rain</nme>
+			</Img>
+			<Int sr="arg3" val="0"/>
+			<Int sr="arg4" val="0"/>
+			<Int sr="arg5" val="3"/>
+		</Action>
+	</Task>
+</TaskerData>
