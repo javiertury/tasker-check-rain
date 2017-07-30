@@ -1,7 +1,7 @@
 <TaskerData sr="" dvi="1" tv="5.0u3m">
 	<Task sr="task18">
 		<cdate>1500918774141</cdate>
-		<edate>1501419709283</edate>
+		<edate>1501444326085</edate>
 		<id>18</id>
 		<nme>Check Rain Continuous</nme>
 		<pri>100</pri>
@@ -22,7 +22,7 @@ chk_fc = 'future';
 chk_fc = 'future';
 }
 global('W_con_title') || setGlobal('W_con_title', 'Rain In A Few Hours');
-if (/^city/i.test(global('W_con_type'))) {
+if (/^city/i.test(global('W_con_lsrc'))) {
 global('W_loc_city') || (err = 1);
 loc_qs = 'q=' + global('W_loc_city');
 loc_s = global('W_loc_city');

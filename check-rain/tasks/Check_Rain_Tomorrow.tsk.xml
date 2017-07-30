@@ -1,7 +1,7 @@
 <TaskerData sr="" dvi="1" tv="5.0u3m">
 	<Task sr="task4">
 		<cdate>1500918774141</cdate>
-		<edate>1501419586386</edate>
+		<edate>1501444332261</edate>
 		<id>4</id>
 		<nme>Check Rain Tomorrow</nme>
 		<pri>100</pri>
@@ -12,7 +12,7 @@ var loc_s;
 var lat_lon;
 var err;
 global('W_tmw_title') || setGlobal('W_tmw_title', 'Tomorrow It Will Rain');
-if (/^city/i.test(global('W_tmw_type'))) {
+if (/^city/i.test(global('W_tmw_lsrc'))) {
 global('W_loc_city') || (err = 1);
 loc_qs = 'q=' + global('W_loc_city');
 loc_s = global('W_loc_city');
