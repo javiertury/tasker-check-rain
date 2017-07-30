@@ -8,11 +8,11 @@ Requirements
 
 # Installation
 The folder `check-rain` in this repo contains 2 folders, `profiles` and `tasks`. Copy those 2 folders to your android device, preferably to `/sdcard/Tasker`.
-  1. Open tasker and then touch and hold on `PROFILES` tab until a menu pops up.
+  1. Open tasker and then touch and hold on `TASKS` tab until a menu pops up.
   2. Select `import`.
-  3. Browse the directory in which you put your `profiles` directory and open it.
+  3. Browse the directory in which you put your `tasks` directory and open it.
   4. Import each profile one by one
-  5. Repeat steps 1-5 for the `tasks` directory to the tab `TASKS`.
+  5. Repeat steps 1-5 for the `profiles` directory to the tab `PROFILES`.
 
 Finally open tasker, go to `VARS` tab and create a variable named `%W_ow_key` with you openweathermap.org API key. There are 3 types of notifications: Morning, Continuous and Tomorrow. If you want to enable any of them, you have to enable each profile pair.
 ```
