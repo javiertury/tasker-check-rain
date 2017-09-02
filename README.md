@@ -68,3 +68,7 @@ Unconditional continuous notifications are great but they are repetitive on rain
 Conditioning on current weather (`on`) has several drawbacks. If the first time you the task runs it is already raining, you won't get a notification. If it was originally forecasted that rain will start at 5:00 but on a later forecast rain is expected to start at 11:00 you will be notified twice. `smart` solves all of this problems.
 
 There is however one requirement for `smart` to work. `%W_con_hahead` interval should be large enough to cover at least 2 checks. That is, if the Continuous profile is set to check every 3 hours, `%W_con_hahead` should be equal or larger than 6.
+
+## Attributions
+
+Data provided and subject to the terms provided by [OpenWeatherMap](openweathermap.org/terms) and [WUnderground](www.wunderground.com/weather/api/d/terms.html) weather services.
